@@ -1,26 +1,63 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+import { csv } from "d3"
+
+import "./App.css";
+
+import Map from "./components/Map/Map";
+import Slider from "./components/Slider/Slider";
+
+const App = () => {
+  const [data, setData] = useState([]);
+  const [currentData, setCurrentData] = useState()
+  const [selectedMinDate, setSelectedMinDate] = useState()
+  const [selectedMaxDate, setSelectedMaxDate] = useState()
+  const [dates, setDates] = useState()
+  const [maxValue, setMaxValue] = useState()
+
+  useEffect(() => {
+    csv('./phe_cases_london_boroughs.csv').then(data => {
+      data = data.map(item => {
+        return {
+          areaName: item.area_name,
+          date: new Date(item.date).getTime(),
+          totalCases: parseInt(item.total_cases) || 0,
+          newCases: parseInt(item.new_cases) || 0
+        }
+      });
+      setData(data);
+
+      const dates = [... new Set(data.map(item => item.date))];
+      setDates(dates)
+
+      setSelectedMinDate(Math.min(...dates))
+      setSelectedMaxDate(Math.max(...dates))
+
+      setMaxValue(Math.max(...data.map(item => item.totalCases)));
+    })
+  }, []);
+
+  useEffect(() => {
+    if (selectedMinDate && selectedMaxDate) {
+      setCurrentData(data.filter(item => item.date >= selectedMinDate && item.date <= selectedMaxDate))
+    }
+  }, [data, selectedMinDate, selectedMaxDate]);
+
+  return <div className="App">
+    {
+      currentData ?
+        <div>
+          <Slider data={data} dates={dates} selectedMinDate={selectedMinDate} selectedMaxDate={selectedMaxDate} setSelectedMinDate={setSelectedMinDate} setSelectedMaxDate={setSelectedMaxDate}/>
+          <Map data={currentData} maxValue={maxValue} />
+        </div>
+        : null
+    }
+
+  </div>
+};
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);
 
 export default App;
