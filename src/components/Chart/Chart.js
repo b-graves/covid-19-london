@@ -142,6 +142,10 @@ export class Chart extends Component {
             return null;
         };
 
+        let ticks = dates.map(( date, index) => {return {index, date}})
+        ticks = ticks.filter(tick => new Date(tick.date).getDate() === 1)
+        ticks = ticks.map(tick => tick.index)
+
         return (
             <div>
                 <div className="chart__container">
@@ -165,6 +169,7 @@ export class Chart extends Component {
                                     }
                                 </Bar>
                                 <YAxis />
+                                <XAxis ticks={ticks} tickFormatter={(index) => months[new Date(dates[index]).getMonth()]} />
 
                                 <Scatter name="red" dataKey="keyDate" fill="red" />
 

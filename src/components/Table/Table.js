@@ -5,7 +5,7 @@ import FlipMove from 'react-flip-move';
 
 export class Table extends Component {
     render() {
-        const { casesByArea } = this.props;
+        const { casesByArea, activeArea, setActiveArea } = this.props;
 
         let areas = Object.keys(casesByArea);
 
@@ -17,7 +17,7 @@ export class Table extends Component {
             <div>
                 <FlipMove>
                     {areas.map(area =>
-                        <div key={area}>
+                        <div key={area} onMouseEnter={() => setActiveArea(area)} onMouseLeave={() => setActiveArea(null)} style={{backgroundColor: area === activeArea ? "skyblue" : null}}>
                             {area} {casesByArea[area]}
                         </div>)}
                 </FlipMove>

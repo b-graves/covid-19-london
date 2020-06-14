@@ -47,6 +47,8 @@ const App = () => {
 
   const [casesByArea, setCasesByArea] = useState();
 
+  const [activeArea, setActiveArea] = useState(null)
+
   useEffect(() => {
     csv('./phe_cases_london_boroughs.csv').then(data => {
       data = data.map(item => {
@@ -156,15 +158,15 @@ const App = () => {
               </Row>
               <Row>
                 <Col sm="4">
-                  <Pie casesByArea={casesByArea} />
+                  <Pie casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
                 </Col>
                 <Col sm="8">
-                  <Map casesByArea={casesByArea} />
+                  <Map casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
                 </Col>
               </Row>
             </Col>
             <Col sm="2">
-              <Table casesByArea={casesByArea} />
+              <Table casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
             </Col>
           </Row>
 

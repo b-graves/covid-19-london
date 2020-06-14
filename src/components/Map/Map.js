@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
-import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker, Annotation } from "react-simple-maps";
 
 import { scaleQuantile } from "d3-scale";
+
+import { geoCentroid } from "d3-geo";
 
 const geoUrl = "https://vega.github.io/vega-datasets/data/londonBoroughs.json";
 
 export class Map extends Component {
     render() {
-        const { casesByArea } = this.props;
+        const { casesByArea, activeArea, setActiveArea } = this.props;
 
         const maxValue = Math.max(...Object.values(casesByArea))
         const colorScale = scaleQuantile()
@@ -34,15 +36,34 @@ export class Map extends Component {
             >
                 <ZoomableGroup zoom={1}>
                     <Geographies geography={geoUrl}>
-                        {({ geographies }) => {
+                        {({ geographies }) => (
+                            <>
+                                {geographies.map(geo => {
+                                    const value = casesByArea[geo.id];
+                                    return (
+                                        <Geography onMouseEnter={() => setActiveArea(geo.id)} onMouseLeave={() => setActiveArea(null)} key={geo.rsmKey} geography={geo} fill={geo.id === activeArea ? "skyblue" : colorScale(value)} stroke="#000" strokeWidth={1} />
+                                    )
+                                })}
+                                {geographies.map(geo => {
+                                    const centroid = geoCentroid(geo);
+                                    return (
+                                        geo.id === activeArea ?
+                                        <g key={geo.rsmKey + "-name"}>
+                                            <Marker onMouseEnter={() => setActiveArea(geo.id)} coordinates={centroid}>
+                                                <text y="2" fontSize={14} textAnchor="middle">
+                                                    {geo.id}
+                                                </text>
+                                            </Marker>
 
-                            return geographies.map(geo => {
-                                const value = casesByArea[geo.id];
-                                return <Geography key={geo.rsmKey} geography={geo} fill={colorScale(value)} stroke="#000" strokeWidth={1} />
-                            })
-                        }
-                        }
+                                  ))}
+                                        </g>
+                                        : null
+                                    );
+                                })}
+                            </>
+                        )}
                     </Geographies>
+
                 </ZoomableGroup>
             </ComposableMap>
         )
