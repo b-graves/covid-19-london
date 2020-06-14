@@ -1,14 +1,15 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 
 import { scaleQuantile } from "d3-scale";
 
 const geoUrl = "https://vega.github.io/vega-datasets/data/londonBoroughs.json";
 
-
 export class Map extends Component {
     render() {
-        const { data, maxValue } = this.props;
+        const { casesByArea } = this.props;
+        
+        const maxValue = Math.max(...Object.values(casesByArea))
         const colorScale = scaleQuantile()
             .domain(Array.from(Array(maxValue).keys()))
             .range([
@@ -23,8 +24,6 @@ export class Map extends Component {
                 "#782618"
             ]);
 
-        console.log(data)
-
         return (
             <ComposableMap
                 projection="geoAzimuthalEqualArea"
@@ -38,11 +37,7 @@ export class Map extends Component {
                         {({ geographies }) => {
 
                             return geographies.map(geo => {
-                                let value = 0;
-                                const item = data.find(item => item.areaName === geo.id);
-                                if (item) {
-                                    value = item.totalCases;
-                                }
+                                const value = casesByArea[geo.id];
                                 return <Geography key={geo.rsmKey} geography={geo} fill={colorScale(value)} stroke="#000" strokeWidth={1} />
                             })
                         }

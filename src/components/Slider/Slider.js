@@ -34,11 +34,11 @@ export class Slider extends Component {
                                 // How much to pad the slider and histogram by, defaults to 20
                                 barPadding={0}
                                 // // The extent of the selection, this doesn't have to be sorted (and you shouldn't sort it to store it)
-                                selection={[dates.indexOf(selectedMinDate), dates.indexOf(selectedMaxDate)]}
+                                selection={[selectedMinDate, selectedMaxDate]}
                                 // A function to handle a change in the selection
                                 onChange={selection => {
-                                    setSelectedMinDate(dates[Math.round(selection[0])]);
-                                    setSelectedMaxDate(dates[Math.round(selection[1])]);
+                                    setSelectedMinDate(Math.round(selection[0]));
+                                    setSelectedMaxDate(Math.round(selection[1]));
                                 }}
                                 showLabels={false}
                             />
@@ -47,10 +47,10 @@ export class Slider extends Component {
 
                 </div>
                 <div>
-                    {new Date(selectedMinDate).getDate()+" "+months[new Date(selectedMinDate).getMonth()]}
+                    {new Date(dates[selectedMinDate]).getDate() + " " + months[new Date(dates[selectedMinDate]).getMonth()]}
                 </div>
                 <div>
-                    {new Date(selectedMaxDate).getDate()+" "+months[new Date(selectedMaxDate).getMonth()]}
+                    {new Date(dates[selectedMaxDate-1]).getDate() + " " + months[new Date(dates[selectedMaxDate-1]).getMonth()]}
                 </div>
             </div>
 
