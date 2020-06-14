@@ -10,8 +10,11 @@ export class ByArea extends Component {
 
         const areas = [...new Set(data.map(item => item.areaName))];
         let casesByArea = {};
+        let casesByAreaByDay = {};
+
 
         areas.forEach(area => {
+            casesByAreaByDay[area] = data.filter(item => item.areaName === area)
             casesByArea[area] = data.filter(item => item.areaName === area).reduce((a, b) => a + b[metric], 0);
         });
 

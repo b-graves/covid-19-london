@@ -144,7 +144,7 @@ export class Chart extends Component {
 
         return (
             <div>
-                <div className="slider__container">
+                <div className="chart__container">
                     <AutoSizer>
                         {(({ width, height }) => width === 0 || height === 0 ? null : (
                             <ComposedChart width={width} height={height}
@@ -164,6 +164,7 @@ export class Chart extends Component {
                                         ))
                                     }
                                 </Bar>
+                                <YAxis />
 
                                 <Scatter name="red" dataKey="keyDate" fill="red" />
 
@@ -172,6 +173,7 @@ export class Chart extends Component {
                                     wrapperStyle={{
                                         visibility: 'visible',
                                     }}
+                                    allowEscapeViewBox={{ x: false, y: false }}
                                     content={<CustomTooltip />}
                                 />
                             </ComposedChart>

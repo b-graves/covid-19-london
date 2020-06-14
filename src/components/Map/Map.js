@@ -8,10 +8,10 @@ const geoUrl = "https://vega.github.io/vega-datasets/data/londonBoroughs.json";
 export class Map extends Component {
     render() {
         const { casesByArea } = this.props;
-        
+
         const maxValue = Math.max(...Object.values(casesByArea))
         const colorScale = scaleQuantile()
-            .domain(Array.from(Array(maxValue).keys()))
+            .domain(Array.from(Array(Math.ceil(maxValue)).keys()))
             .range([
                 "#ffedea",
                 "#ffcec5",
