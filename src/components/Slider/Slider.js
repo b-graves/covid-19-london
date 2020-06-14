@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Histoslider } from "histoslider"
+import { RangeSlider } from 'reactrangeslider';
 
 import "./Slider.css"
 
@@ -9,52 +9,27 @@ const months = ["Jan", "Feb", "March", "April", "May", "June", "July", "Oct", "N
 
 export class Slider extends Component {
     render() {
-        const { dates, data, selectedMinDate, selectedMaxDate, setSelectedMinDate, setSelectedMaxDate } = this.props;
+        const { dates, selectedMinDate, selectedMaxDate, setSelectedMinDate, setSelectedMaxDate } = this.props;
+
         return (
             <div>
-                <div className="slider__container">
-                    <AutoSizer>
-                        {(({ width, height }) => width === 0 || height === 0 ? null : (
-                            <Histoslider
-                                // An array of objects to create the histogram
-                                data={dates.map((date, index) => {
-                                    const y = data.filter(item => item.date === date).reduce((a, b) => a + b.newCases, 0);
-                                    return {
-                                        x0: index,
-                                        x: index + 1,
-                                        y
-                                    }
-                                })}
-                                width={width}
-                                height={height}
-                                barStyle={{
-                                    rx: 0,
-                                    ry: 0
-                                }}
-                                // How much to pad the slider and histogram by, defaults to 20
-                                barPadding={0}
-                                // // The extent of the selection, this doesn't have to be sorted (and you shouldn't sort it to store it)
-                                selection={[selectedMinDate, selectedMaxDate]}
-                                // A function to handle a change in the selection
-                                onChange={selection => {
-                                    setSelectedMinDate(Math.round(selection[0]));
-                                    setSelectedMaxDate(Math.round(selection[1]));
-                                }}
-                                showLabels={false}
-                            />
-                        ))}
-                    </AutoSizer>
-
-                </div>
+                <RangeSlider
+                    value={{ start: selectedMinDate, end: selectedMaxDate }}
+                    afterChange={(newValue) => {
+                        setSelectedMinDate(newValue.start)
+                        setSelectedMaxDate(newValue.end)
+                    }}
+                    min={0}
+                    max={dates.length}
+                    step={1}
+                />
                 <div>
                     {new Date(dates[selectedMinDate]).getDate() + " " + months[new Date(dates[selectedMinDate]).getMonth()]}
                 </div>
                 <div>
-                    {new Date(dates[selectedMaxDate-1]).getDate() + " " + months[new Date(dates[selectedMaxDate-1]).getMonth()]}
+                    {new Date(dates[selectedMaxDate - 1]).getDate() + " " + months[new Date(dates[selectedMaxDate - 1]).getMonth()]}
                 </div>
-            </div>
-
-
+            </div >
         )
     }
 }

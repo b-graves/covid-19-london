@@ -7,6 +7,7 @@ import "./App.css";
 
 import ByArea from "./components/ByArea/ByArea";
 import Chart from "./components/Chart/Chart";
+import Slider  from "./components/Slider/Slider";
 
 import Timeline from "./components/Timeline/Timeline";
 
@@ -88,6 +89,7 @@ const App = () => {
           }}>Total Cases</button>
 
           <Chart data={data} dates={dates} selectedMinDate={selectedMinDate} selectedMaxDate={selectedMaxDate} setSelectedMinDate={setSelectedMinDate} setSelectedMaxDate={setSelectedMaxDate} keyDates={keyDates} metric={metric} allowRange={metric !== "totalCases"} />
+
           <ByArea data={currentData} metric={metric} />
         </div>
         : null

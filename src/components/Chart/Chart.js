@@ -99,7 +99,6 @@ export class Chart extends Component {
             const keyDate = keyDates.find(keyDate => keyDate.date === date)
 
             if (keyDate) {
-                console.log(keyDate)
                 item.keyDate = true;
                 item.keyDateInfo = keyDate;
             }

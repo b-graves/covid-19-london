@@ -19,6 +19,7 @@
     "react-simple-maps": "^2.1.2",
     "react-twitter-embed": "^3.0.3",
     "react-virtualized": "^9.21.2",
+    "reactrangeslider": "^3.0.6",
     "recharts": "^1.8.5"
   },
   "scripts": {
