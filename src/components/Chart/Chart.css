@@ -21,3 +21,8 @@ svg {
 .tweet-placeholder {
     height: 200px;
 }
+
+svg text::selection { background: none; }
+
+
+tspan::selection { background: none; }
