@@ -26,6 +26,10 @@ export class Chart extends Component {
     selectRange() {
         let { refAreaLeft, refAreaRight, data } = this.state;
 
+        if (refAreaLeft === '') {
+            return
+        }
+
         this.setState(() => ({
             refAreaLeft: '',
             refAreaRight: '',
@@ -122,7 +126,7 @@ export class Chart extends Component {
             return null;
         };
 
-        let ticks = dates.map(( date, index) => {return {index, date}})
+        let ticks = dates.map((date, index) => { return { index, date } })
         ticks = ticks.filter(tick => new Date(tick.date).getDate() === 1)
         ticks = ticks.map(tick => tick.index)
 
@@ -133,17 +137,26 @@ export class Chart extends Component {
                         {(({ width, height }) => width === 0 || height === 0 ? null : (
                             <ComposedChart width={width} height={height}
                                 data={chartData}
-                                onMouseDown={allowRange ? e => this.setState({ refAreaLeft: e.activeLabel, selecting: true }) : this.selectDateDown.bind(this)}
-                                onMouseMove={allowRange ? e => this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel }) : this.selectDateMove.bind(this)}
+                                onMouseDown={
+                                    allowRange ?
+                                        e => e !== null ? this.setState({ refAreaLeft: e.activeLabel, selecting: true }) : null
+                                        :
+                                        this.selectDateDown.bind(this)
+                                }
+                                onMouseMove={
+                                    allowRange ?
+                                        e => this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel })
+                                        :
+                                        this.selectDateMove.bind(this)}
                                 onMouseUp={allowRange ? this.selectRange.bind(this) : this.selectDateUp.bind(this)}
                                 barCategoryGap={0}
-                            
+
 
                             >
 
                                 <Bar
                                     dataKey="cases"
-                                
+
                                 >
                                     {
                                         chartData.map((entry, index) => (
@@ -151,9 +164,10 @@ export class Chart extends Component {
                                         ))
                                     }
                                 </Bar>
-                                <YAxis width={35}/>
-                                <XAxis 
-                                ticks={ticks} tickFormatter={(index) => months[new Date(dates[index]).getMonth()]} />
+                                <YAxis width={35} />
+                                <XAxis
+                                    ticks={ticks} tickFormatter={(index) => months[new Date(dates[index]).getMonth()]}
+                                    />
 
                                 <Scatter name="red" dataKey="keyDateYLocation" fill="red" />
 
