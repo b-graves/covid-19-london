@@ -139,13 +139,18 @@ export class Chart extends Component {
                                 data={chartData}
                                 onMouseDown={
                                     allowRange ?
-                                        e => e !== null ? this.setState({ refAreaLeft: e.activeLabel, selecting: true }) : null
+                                        (loc, e) => {
+                                            e.preventDefault();
+                                            if (loc !== null) {
+                                                this.setState({ refAreaLeft: loc.activeLabel, selecting: true })
+                                            }
+                                        }
                                         :
                                         this.selectDateDown.bind(this)
                                 }
                                 onMouseMove={
                                     allowRange ?
-                                        e => this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel })
+                                        e => this.state.refAreaLeft !== '' && this.setState({ refAreaRight: e.activeLabel })
                                         :
                                         this.selectDateMove.bind(this)}
                                 onMouseUp={allowRange ? this.selectRange.bind(this) : this.selectDateUp.bind(this)}
@@ -167,7 +172,7 @@ export class Chart extends Component {
                                 <YAxis width={35} />
                                 <XAxis
                                     ticks={ticks} tickFormatter={(index) => months[new Date(dates[index]).getMonth()]}
-                                    />
+                                />
 
                                 <Scatter name="red" dataKey="keyDateYLocation" fill="red" />
 
