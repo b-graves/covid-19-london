@@ -10,9 +10,9 @@ import { AutoSizer } from 'react-virtualized';
 
 import { TwitterTweetEmbed } from 'react-twitter-embed';
 
+import { RiMapPin3Line } from "react-icons/ri"
+
 const months = ["Jan", "Feb", "March", "April", "May", "June", "July", "Oct", "Nov", "Dec"]
-
-
 
 
 export class Chart extends Component {
@@ -82,29 +82,7 @@ export class Chart extends Component {
     }
 
     render() {
-        const { dates, data, selectedMinDate, selectedMaxDate, keyDates, metric, allowRange } = this.props;
-
-        const chartData = dates.map((date, index) => {
-            const cases = data.filter(item => item.date === date).reduce((a, b) => a + b[metric], 0);
-
-            const active = index >= selectedMinDate && index <= selectedMaxDate;
-
-            let item = {
-                date,
-                cases,
-                active,
-                dateReal: new Date(date),
-            }
-
-            const keyDate = keyDates.find(keyDate => keyDate.date === date)
-
-            if (keyDate) {
-                item.keyDate = true;
-                item.keyDateInfo = keyDate;
-            }
-
-            return item
-        })
+        const { dates, chartData, selectedMinDate, selectedMaxDate, keyDates, metric, allowRange } = this.props;
 
         const CustomTooltip = ({ active, payload, label }) => {
             if (active || this.state.selecting) {
@@ -156,22 +134,26 @@ export class Chart extends Component {
                                 onMouseDown={allowRange ? e => this.setState({ refAreaLeft: e.activeLabel, selecting: true }) : this.selectDateDown.bind(this)}
                                 onMouseMove={allowRange ? e => this.state.refAreaLeft && this.setState({ refAreaRight: e.activeLabel }) : this.selectDateMove.bind(this)}
                                 onMouseUp={allowRange ? this.selectRange.bind(this) : this.selectDateUp.bind(this)}
+                                barCategoryGap={0}
+                            
 
                             >
 
                                 <Bar
                                     dataKey="cases"
+                                
                                 >
                                     {
                                         chartData.map((entry, index) => (
-                                            <Cell cursor="pointer" fill={this.isSelected(entry, index) ? 'red' : 'black'} key={`cell-${index}`} />
+                                            <Cell cursor="pointer" fill={this.isSelected(entry, index) ? "#1155ccff" : "#c9daf8ff"} key={`cell-${index}`} />
                                         ))
                                     }
                                 </Bar>
-                                <YAxis />
-                                <XAxis ticks={ticks} tickFormatter={(index) => months[new Date(dates[index]).getMonth()]} />
+                                <YAxis width={35}/>
+                                <XAxis 
+                                ticks={ticks} tickFormatter={(index) => months[new Date(dates[index]).getMonth()]} />
 
-                                <Scatter name="red" dataKey="keyDate" fill="red" />
+                                <Scatter name="red" dataKey="keyDateYLocation" fill="red" />
 
                                 <Tooltip
                                     active={true}
@@ -185,12 +167,6 @@ export class Chart extends Component {
                         ))}
                     </AutoSizer>
 
-                </div>
-                <div>
-                    {new Date(dates[selectedMinDate]).getDate() + " " + months[new Date(dates[selectedMinDate]).getMonth()]}
-                </div>
-                <div>
-                    {new Date(dates[selectedMaxDate]).getDate() + " " + months[new Date(dates[selectedMaxDate]).getMonth()]}
                 </div>
             </div>
 

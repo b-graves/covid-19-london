@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
 import { csv } from "d3"
+import { scaleQuantile } from "d3-scale";
 
 import "./App.css";
 
@@ -9,11 +10,12 @@ import Table from "./components/Table/Table";
 import Pie from "./components/Pie/Pie";
 import Map from "./components/Map/Map";
 import Chart from "./components/Chart/Chart";
-import Slider from "./components/Slider/Slider";
 
 import Timeline from "./components/Timeline/Timeline";
 
 import { Container, Row, Col } from 'reactstrap';
+
+const months = ["Jan", "Feb", "March", "April", "May", "June", "July", "Oct", "Nov", "Dec"]
 
 const addDays = (date, days) => {
   var result = new Date(date);
@@ -64,7 +66,7 @@ const App = () => {
       const dates = [... new Set(data.map(item => item.date))];
       setDates(dates)
 
-      setSelectedMinDate(0)
+      setSelectedMinDate(dates.length - 31)
       setSelectedMaxDate(dates.length - 1)
     })
   }, []);
@@ -85,7 +87,12 @@ const App = () => {
 
   useEffect(() => {
     csv('./populations.csv').then(populations => {
-      setPopulations(populations)
+      setPopulations(populations.map(item => {
+        return {
+          ...item,
+          population: parseInt(item.population)
+        }
+      }))
     });
   }, []);
 
@@ -105,10 +112,35 @@ const App = () => {
       const currentKeyDates = keyDates.filter(item => item.date >= startDate.getTime() && item.date <= endDate.getTime())
       setCurrentKeyDates(currentKeyDates)
 
-      let chartData = data;
-      if (adjustToPopulation && populations) {
-        chartData = chartData.map(item => adjustData(item, populations, metric))
-      }
+      const chartData = dates.map((date, index) => {
+        let cases = data.filter(item => item.date === date).reduce((a, b) => a + b[metric], 0);
+
+        if (adjustToPopulation && populations) {
+          const totalPopulation = populations.reduce((a, b) => a + b.population, 0);
+          console.log(totalPopulation)
+          cases = (cases / totalPopulation) * 10000
+        }
+
+        const active = index >= selectedMinDate && index <= selectedMaxDate;
+
+        let item = {
+          date,
+          cases,
+          active,
+          dateReal: new Date(date),
+        }
+
+        const keyDate = keyDates.find(keyDate => keyDate.date === date)
+
+        if (keyDate) {
+          item.keyDate = true;
+          item.keyDateYLocation = 0
+          item.keyDateInfo = keyDate;
+        }
+
+        return item
+      })
+
       setChartData(chartData)
 
       const areas = [...new Set(currentData.map(item => item.areaName))];
@@ -119,54 +151,110 @@ const App = () => {
       });
 
       setCasesByArea(casesByArea)
+
+      const maxValue = Math.max(...Object.values(casesByArea))
+
     }
   }, [data, keyDates, selectedMinDate, selectedMaxDate, dates, adjustToPopulation, populations, metric]);
-
 
   return <div className="App">
     {
       currentData ?
         <Container>
           <Row>
-          <Col>
-          <h1>COVID-19 in London</h1>
-          </Col>
-          <Col>
-            <button onClick={() => setMetric("newCases")}>New Cases</button>
-            <button onClick={() => {
-              setMetric("totalCases");
-              setSelectedMinDate(dates.length - 1);
-              setSelectedMaxDate(dates.length - 1)
-            }}>Total Cases</button>
-
-            <button onClick={() => {
-              setAdjustToPopulation(true)
-            }}>Adjust</button>
-
-            <button onClick={() => {
-              setAdjustToPopulation(false)
-            }}>Don't Adjust</button>
+            <Col>
+              <div className="title">COVID-19 in London</div>
             </Col>
           </Row>
           <Row>
-
             <Col sm="10">
               <Row>
                 <Col>
-                  <Chart data={chartData} dates={dates} selectedMinDate={selectedMinDate} selectedMaxDate={selectedMaxDate} setSelectedMinDate={setSelectedMinDate} setSelectedMaxDate={setSelectedMaxDate} keyDates={keyDates} metric={metric} allowRange={metric !== "totalCases"} />
+                  <div className="section">
+                    <div className="section__heading">METRIC</div>
+                    <button className={metric === "newCases" ? "controls__button controls__button--active" : "controls__button"}
+                      onClick={() => {
+                        setMetric("newCases");
+                        setSelectedMinDate(dates.length - 31);
+                        setSelectedMaxDate(dates.length - 1)
+                      }}>New Cases</button>
+                    <button className={metric === "totalCases" ? "controls__button controls__button--active" : "controls__button"}
+                      onClick={() => {
+                        setMetric("totalCases");
+                        setSelectedMinDate(dates.length - 1);
+                        setSelectedMaxDate(dates.length - 1)
+                      }}>Total Cases</button>
+                  </div>
+                </Col>
+                <Col>
+                  <div className="section">
+                    <div className="section__heading">POPULATION NORMALISATION</div>
+                    <button
+                      className={!adjustToPopulation ? "controls__button controls__button--active" : "controls__button"}
+                      onClick={() => {
+                        setAdjustToPopulation(false)
+                      }}>Unormalised</button>
+                    <button
+                      className={adjustToPopulation ? "controls__button controls__button--active" : "controls__button"}
+                      onClick={() => {
+                        setAdjustToPopulation(true)
+                      }}>Normalised (per 10,000 people) </button>
+                  </div>
+                </Col>
+                <Col>
+                  {metric !== "totalCases" ?
+                    <div className="section">
+                      <div className="section__heading">DATE RANGE</div>
+                      <div className="controls__button controls__button--active">
+                        {new Date(dates[selectedMinDate]).getDate() + " " + months[new Date(dates[selectedMinDate]).getMonth()]} - {new Date(dates[selectedMaxDate]).getDate() + " " + months[new Date(dates[selectedMaxDate]).getMonth()]}
+                      </div>
+                      <div className="controls__tip">
+                        (Select date range from graph below)
+                    </div>
+                    </div>
+                    :
+                    <div className="section">
+                      <div className="section__heading">DATE</div>
+                      <div className="controls__button controls__button--active">
+                        {new Date(dates[selectedMinDate]).getDate() + " " + months[new Date(dates[selectedMinDate]).getMonth()]}
+                      </div>
+                      <div className="controls__tip">
+                        (Select date from graph below)
+                    </div>
+                    </div>
+                  }
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <div className="section">
+                    <div className="section__heading">DAILY CASES - ALL BOROUGHS
+                </div>
+                    <Chart chartData={chartData} dates={dates} selectedMinDate={selectedMinDate} selectedMaxDate={selectedMaxDate} setSelectedMinDate={setSelectedMinDate} setSelectedMaxDate={setSelectedMaxDate} keyDates={keyDates} metric={metric} allowRange={metric !== "totalCases"} />
+                  </div>
                 </Col>
               </Row>
               <Row>
                 <Col sm="4">
-                  <Pie casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
+                  <div className="section">
+                    <div className="section__heading">PROPORTION BY BOROUGH</div>
+                    <Pie casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
+                  </div>
                 </Col>
                 <Col sm="8">
-                  <Map casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
+                  <div className="section">
+                    <div className="section__heading">GEOGRAPHIC DISTRIBUTION</div>
+                    <Map casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
+                  </div>
                 </Col>
               </Row>
             </Col>
             <Col sm="2">
-              <Table casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
+              <div className="section">
+                <div className="section__heading">CASES BY BOROUGH
+            </div>
+                <Table casesByArea={casesByArea} activeArea={activeArea} setActiveArea={setActiveArea} />
+              </div>
             </Col>
           </Row>
 
@@ -174,7 +262,7 @@ const App = () => {
         : null
     }
 
-  </div>
+  </div >
 };
 
 const rootElement = document.getElementById("root");

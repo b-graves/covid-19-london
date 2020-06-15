@@ -1,29 +1,33 @@
 import React, { Component } from 'react';
 import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker, Annotation } from "react-simple-maps";
 
-import { scaleQuantile } from "d3-scale";
+import { scaleLinear, scaleQuantile } from "d3-scale";
 
 import { geoCentroid } from "d3-geo";
 
+import "./Map.css";
+
 const geoUrl = "https://vega.github.io/vega-datasets/data/londonBoroughs.json";
+
+
 
 export class Map extends Component {
     render() {
         const { casesByArea, activeArea, setActiveArea } = this.props;
 
         const maxValue = Math.max(...Object.values(casesByArea))
-        const colorScale = scaleQuantile()
-            .domain(Array.from(Array(Math.ceil(maxValue)).keys()))
+        const colorScale = scaleLinear()
+            .domain([0, Math.ceil(maxValue + 1)])
             .range([
-                "#ffedea",
-                "#ffcec5",
-                "#ffad9f",
-                "#ff8a75",
-                "#ff5533",
-                "#e2492d",
-                "#be3d26",
-                "#9a311f",
-                "#782618"
+                "#c9daf8ff",
+                "#1155ccff"
+            ]);
+
+        const labelScale = scaleQuantile()
+            .domain([0, Math.ceil(maxValue + 1)])
+            .range([
+                "#000",
+                "#fff"
             ]);
 
         return (
@@ -41,23 +45,24 @@ export class Map extends Component {
                                 {geographies.map(geo => {
                                     const value = casesByArea[geo.id];
                                     return (
-                                        <Geography onMouseEnter={() => setActiveArea(geo.id)} onMouseLeave={() => setActiveArea(null)} key={geo.rsmKey} geography={geo} fill={geo.id === activeArea ? "skyblue" : colorScale(value)} stroke="#000" strokeWidth={1} />
+                                        <Geography onMouseEnter={() => setActiveArea(geo.id)} onMouseLeave={() => setActiveArea(null)} key={geo.rsmKey} geography={geo} fill={colorScale(value)} stroke={"#fff"} strokeWidth={0} />
                                     )
                                 })}
                                 {geographies.map(geo => {
                                     const centroid = geoCentroid(geo);
+                                    const value = casesByArea[geo.id];
                                     return (
-                                        geo.id === activeArea ?
-                                        <g key={geo.rsmKey + "-name"}>
-                                            <Marker onMouseEnter={() => setActiveArea(geo.id)} coordinates={centroid}>
-                                                <text y="2" fontSize={14} textAnchor="middle">
-                                                    {geo.id}
-                                                </text>
-                                            </Marker>
+                                        activeArea === geo.id ?
+                                            <g key={geo.rsmKey + "-name"}>
+                                                <Marker onMouseEnter={() => setActiveArea(geo.id)} coordinates={centroid}>
+                                                    <text y="0" fontSize={26} textAnchor="middle" fill={labelScale(value)} >
+                                                        {geo.id}
+                                                    </text>
+                                                </Marker>
 
                                   ))}
                                         </g>
-                                        : null
+                                            : null
                                     );
                                 })}
                             </>

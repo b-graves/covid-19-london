@@ -37,8 +37,43 @@
   }
 }
 
+.title {
+  font-size: 2.5em;
+  padding: 10px 0;
+}
 
 
+.col {
+  text-align: left;
+}
+
+.section__heading {
+  padding-bottom: 5px
+}
+
+.section {
+  margin: 10px 0;
+  text-align: left;
+}
+
+.controls__button {
+  background-color: #a5c0ef;
+  color: white;
+  border: none;
+  display: block;
+  font-size: 1.1em;
+  margin: 5px 0;
+  padding: 0 5px;
+  width: fit-content;
+}
+
+.controls__button--active {
+  background-color: #1357cc;
+}
+
+.controls__tip {
+  font-size: 0.8em;
+}
 
 
 
