@@ -101,6 +101,7 @@ export class Chart extends Component {
                                     {item.keyDateInfo.description}
                                     <TwitterTweetEmbed
                                         tweetId={item.keyDateInfo.tweetId}
+                                        key={item.keyDateInfo.tweetId}
                                         options={{
                                             cards: 'hidden',
                                             width: 350,
