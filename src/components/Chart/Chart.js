@@ -103,8 +103,9 @@ export class Chart extends Component {
                                         tweetId={item.keyDateInfo.tweetId}
                                         options={{
                                             cards: 'hidden',
-
+                                            width: 350,
                                         }}
+                                        placeholder={<div className="tweet-placeholder">Loading Tweet...</div>}
                                     />
                                 </div>
                                 :

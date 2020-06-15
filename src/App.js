@@ -167,9 +167,9 @@ const App = () => {
             </Col>
           </Row>
           <Row>
-            <Col sm="10">
+            <Col sm="9">
               <Row>
-                <Col>
+                <Col sm="4">
                   <div className="section">
                     <div className="section__heading">METRIC</div>
                     <button className={metric === "newCases" ? "controls__button controls__button--active" : "controls__button"}
@@ -186,7 +186,7 @@ const App = () => {
                       }}>Total Cases</button>
                   </div>
                 </Col>
-                <Col>
+                <Col sm="4">
                   <div className="section">
                     <div className="section__heading">POPULATION NORMALISATION</div>
                     <button
@@ -198,10 +198,10 @@ const App = () => {
                       className={adjustToPopulation ? "controls__button controls__button--active" : "controls__button"}
                       onClick={() => {
                         setAdjustToPopulation(true)
-                      }}>Normalised (per 10,000 people) </button>
+                      }}>Normalised (per 10k ppl) </button>
                   </div>
                 </Col>
-                <Col>
+                <Col sm="4">
                   {metric !== "totalCases" ?
                     <div className="section">
                       <div className="section__heading">DATE RANGE</div>
@@ -249,7 +249,7 @@ const App = () => {
                 </Col>
               </Row>
             </Col>
-            <Col sm="2">
+            <Col sm="3">
               <div className="section">
                 <div className="section__heading">CASES BY BOROUGH
             </div>

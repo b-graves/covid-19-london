@@ -38,38 +38,38 @@ export class Map extends Component {
                     scale: 55000
                 }}
             >
-                <ZoomableGroup zoom={1}>
-                    <Geographies geography={geoUrl}>
-                        {({ geographies }) => (
-                            <>
-                                {geographies.map(geo => {
-                                    const value = casesByArea[geo.id];
-                                    return (
-                                        <Geography onMouseEnter={() => setActiveArea(geo.id)} onMouseLeave={() => setActiveArea(null)} key={geo.rsmKey} geography={geo} fill={colorScale(value)} stroke={"#fff"} strokeWidth={0} />
-                                    )
-                                })}
-                                {geographies.map(geo => {
-                                    const centroid = geoCentroid(geo);
-                                    const value = casesByArea[geo.id];
-                                    return (
-                                        activeArea === geo.id ?
-                                            <g key={geo.rsmKey + "-name"}>
-                                                <Marker onMouseEnter={() => setActiveArea(geo.id)} coordinates={centroid}>
-                                                    <text y="0" fontSize={26} textAnchor="middle" fill={labelScale(value)} >
-                                                        {geo.id}
-                                                    </text>
-                                                </Marker>
+                Ï
+                <Geographies geography={geoUrl}>
+                    {({ geographies }) => (
+                        <>
+                            {geographies.map(geo => {
+                                const value = casesByArea[geo.id];
+                                return (
+                                    <Geography onMouseEnter={() => setActiveArea(geo.id)} onMouseLeave={() => setActiveArea(null)} key={geo.rsmKey} geography={geo} fill={colorScale(value)} stroke={"#fff"} strokeWidth={0} />
+                                )
+                            })}
+                            {geographies.map(geo => {
+                                const centroid = geoCentroid(geo);
+                                const value = casesByArea[geo.id];
+                                return (
+                                    activeArea === geo.id ?
+                                        <g key={geo.rsmKey + "-name"}>
+                                            <Marker onMouseEnter={() => setActiveArea(geo.id)} coordinates={centroid}>
+                                                <text y="0" fontSize={26} textAnchor="middle" fill={labelScale(value)} >
+                                                    {geo.id}
+                                                </text>
+                                            </Marker>
 
                                   ))}
                                         </g>
-                                            : null
-                                    );
-                                })}
-                            </>
-                        )}
-                    </Geographies>
+                                        : null
+                                );
+                            })}
+                        </>
+                    )}
+                </Geographies>
 
-                </ZoomableGroup>
+
             </ComposableMap>
         )
     }
