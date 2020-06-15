@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 
 import { csv } from "d3"
-import { scaleQuantile } from "d3-scale";
 
 import "./App.css";
 
@@ -11,7 +10,6 @@ import Pie from "./components/Pie/Pie";
 import Map from "./components/Map/Map";
 import Chart from "./components/Chart/Chart";
 
-import Timeline from "./components/Timeline/Timeline";
 
 import { Container, Row, Col } from 'reactstrap';
 
@@ -39,7 +37,6 @@ const App = () => {
   const [dates, setDates] = useState()
 
   const [keyDates, setKeyDates] = useState([]);
-  const [currentKeyDates, setCurrentKeyDates] = useState();
 
   const [populations, setPopulations] = useState([]);
 
@@ -108,9 +105,6 @@ const App = () => {
       }
 
       setCurrentData(currentData)
-
-      const currentKeyDates = keyDates.filter(item => item.date >= startDate.getTime() && item.date <= endDate.getTime())
-      setCurrentKeyDates(currentKeyDates)
 
       const chartData = dates.map((date, index) => {
         let cases = data.filter(item => item.date === date).reduce((a, b) => a + b[metric], 0);
